@@ -23,6 +23,8 @@ class StreamSelectLoop implements LoopInterface
     private $enterIdleStreams = [];
     private $enterIdleListeners = [];
     private $enterIdleLastTime = 0;
+    private $enterIdleTimeOut = 0;
+    
     private $running;
 
     public function __construct()
@@ -139,7 +141,11 @@ class StreamSelectLoop implements LoopInterface
     {
         $this->futureTickQueue->add($listener);
     }
-
+    
+    public function setEnterIdleTimeOut($enterIdleTimeOut){
+        $this->enterIdleTimeOut = $enterIdleTimeOut;
+    }
+    
     public function addEnterIdle($stream, $listener){
         $key = (int) $stream;
 
@@ -185,6 +191,10 @@ class StreamSelectLoop implements LoopInterface
             // There's nothing left to do ...
             } else {
                 break;
+            }
+            
+            if($timeout == 0 || $timeout == null && $this->enterIdleTimeOut > 0){
+                $timeout = $this->enterIdleTimeOut;
             }
 
             $this->waitForStreamActivity($timeout);
