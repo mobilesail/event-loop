@@ -221,7 +221,7 @@ class StreamSelectLoop implements LoopInterface
 
         $available = $this->streamSelect($read, $write, $timeout);
         
-        echo "$available = $this->streamSelect(read, write, $timeout);" . PHP_EOL;
+        echo "$available = this->streamSelect(read, write, $timeout);" . PHP_EOL;
         
         if (false === $available) {
             // if a system call has been interrupted,
@@ -231,7 +231,7 @@ class StreamSelectLoop implements LoopInterface
         
         if (0 == $available) {
             
-            echo "if (false === $available) {" . PHP_EOL;
+            echo "$timeout !== null && ($this->enterIdleLastTime + $timeout) <= " . microtime() . PHP_EOL;
             //Idling
             if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= microtime()) {
                 
