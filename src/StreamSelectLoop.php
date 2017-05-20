@@ -196,6 +196,8 @@ class StreamSelectLoop implements LoopInterface
             if($timeout == 0 || $timeout == null && $this->enterIdleTimeOut > 0){
                 $timeout = $this->enterIdleTimeOut;
             }
+            
+            echo "timeout = $timeout" . PHP_EOL;
 
             $this->waitForStreamActivity($timeout);
         }
