@@ -221,9 +221,15 @@ class StreamSelectLoop implements LoopInterface
 
         $available = $this->streamSelect($read, $write, $timeout);
         
-        echo "$available = $this->streamSelect($read, $write, $timeout);" . PHP_EOL;
+        echo "$available = $this->streamSelect(read, write, $timeout);" . PHP_EOL;
         
         if (false === $available) {
+            // if a system call has been interrupted,
+            // we cannot rely on it's outcome
+            return;
+        }
+        
+        if (0 == $available) {
             
             echo "if (false === $available) {" . PHP_EOL;
             //Idling
