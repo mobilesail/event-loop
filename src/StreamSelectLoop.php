@@ -220,6 +220,9 @@ class StreamSelectLoop implements LoopInterface
         $write = $this->writeStreams;
 
         $available = $this->streamSelect($read, $write, $timeout);
+        
+        echo "$available = $this->streamSelect($read, $write, $timeout);" . PHP_EOL;
+        
         if (false === $available) {
             
             echo "if (false === $available) {" . PHP_EOL;
