@@ -20,8 +20,9 @@ class StreamSelectLoop implements LoopInterface
     private $readListeners = [];
     private $writeStreams = [];
     private $writeListeners = [];
-    private $idleStreams = [];
-    private $idleListeners = [];
+    private $enterIdleStreams = [];
+    private $enterIdleListeners = [];
+    private $enterIdleLastTime = 0;
     private $running;
 
     public function __construct()
@@ -142,9 +143,9 @@ class StreamSelectLoop implements LoopInterface
     public function addEnterIdle($stream, $listener){
         $key = (int) $stream;
 
-        if (!isset($this->idleListeners[$key])) {
-            $this->idleStreams[$key] = $stream;
-            $this->idleListeners[$key] = $listener;
+        if (!isset($this->enterIdleListeners[$key])) {
+            $this->enterIdleStreams[$key] = $stream;
+            $this->enterIdleListeners[$key] = $listener;
         }
     }
     
@@ -210,15 +211,15 @@ class StreamSelectLoop implements LoopInterface
         if (false === $available) {
             
             //Idling
-            if ($timeout !== null && ($idleLast + $timeout) <= time()) {
+            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= time()) {
 
-                $idleLast = time();
+                $this->enterIdleLastTime = time();
                 
-                foreach ($this->idleStreams as $idleStream) {
-                    $key = (int) $idleStream;
+                foreach ($this->enterIdleStreams as $enterIdleStream) {
+                    $key = (int) $enterIdleStream;
 
-                    if (isset($this->idleListeners[$key])) {
-                        call_user_func($this->idleListeners[$key], $idleStream, $this);
+                    if (isset($this->enterIdleListeners[$key])) {
+                        call_user_func($this->enterIdleListeners[$key], $enterIdleStream, $this);
                     }
                 }
                 
