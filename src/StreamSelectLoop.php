@@ -20,6 +20,8 @@ class StreamSelectLoop implements LoopInterface
     private $readListeners = [];
     private $writeStreams = [];
     private $writeListeners = [];
+    private $idleStreams = [];
+    private $idleListeners = [];
     private $running;
 
     public function __construct()
@@ -137,6 +139,15 @@ class StreamSelectLoop implements LoopInterface
         $this->futureTickQueue->add($listener);
     }
 
+    public function addEnterIdle($stream, $listener){
+        $key = (int) $stream;
+
+        if (!isset($this->idleListeners[$key])) {
+            $this->idleStreams[$key] = $stream;
+            $this->idleListeners[$key] = $listener;
+        }
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -197,11 +208,27 @@ class StreamSelectLoop implements LoopInterface
 
         $available = $this->streamSelect($read, $write, $timeout);
         if (false === $available) {
+            
+            //Idling
+            if ($timeout !== null && ($idleLast + $timeout) <= time()) {
+
+                $idleLast = time();
+                
+                foreach ($this->idleStreams as $idleStream) {
+                    $key = (int) $idleStream;
+
+                    if (isset($this->idleListeners[$key])) {
+                        call_user_func($this->idleListeners[$key], $idleStream, $this);
+                    }
+                }
+                
+            }
+            
             // if a system call has been interrupted,
             // we cannot rely on it's outcome
             return;
         }
-
+        
         foreach ($read as $stream) {
             $key = (int) $stream;
 
