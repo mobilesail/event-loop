@@ -219,34 +219,20 @@ class StreamSelectLoop implements LoopInterface
 
         $available = $this->streamSelect($read, $write, $timeout);
         
-        echo "if (false === $available) {". PHP_EOL;
-        
         if (false === $available) {
             // if a system call has been interrupted,
             // we cannot rely on it's outcome
             return;
         }
         
-        echo "if (0 == $available) {". PHP_EOL;
-        
         if (0 == $available) {
             //Idling
             
-            $microtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
-            echo "b {$this->enterIdleLastTime} + {$timeout}" . PHP_EOL;
-            echo $microtime . PHP_EOL;
-            echo ($this->enterIdleLastTime + (FLOAT) $timeout) . PHP_EOL;
-            echo (($this->enterIdleLastTime + (FLOAT) $timeout) <= $microtime) . PHP_EOL;
-            echo "b if ({$timeout} !== null AND ({$this->enterIdleLastTime} + {$timeout} ) <= " . $microtime . ') {a (' . $this->enterIdleLastTime + (FLOAT) $timeout . ')' . PHP_EOL;
+            $current_mtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
             
-            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= $microtime) {
+            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= $current_mtime) {
                 
-                echo "a if ($timeout !== null AND ( $this->enterIdleLastTime + $timeout ) <= " . $microtime . ") {b" . PHP_EOL;
-
-                
-                $this->enterIdleLastTime = $microtime;
-                
-                echo "this->enterIdleLastTime = " . $this->enterIdleLastTime . PHP_EOL;
+                $this->enterIdleLastTime = $current_mtime;
                 
                 foreach ($this->enterIdleStreams as $enterIdleStream) {
                     $key = (int) $enterIdleStream;
