@@ -232,14 +232,14 @@ class StreamSelectLoop implements LoopInterface
         if (0 == $available) {
             //Idling
             
-            $microtime = microtime(true);
+            $microtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
             echo "b {$this->enterIdleLastTime} + {$timeout}" . PHP_EOL;
             echo $microtime . PHP_EOL;
             echo ($this->enterIdleLastTime + (FLOAT) $timeout) . PHP_EOL;
             echo (($this->enterIdleLastTime + (FLOAT) $timeout) <= $microtime) . PHP_EOL;
             echo "b if ({$timeout} !== null AND ({$this->enterIdleLastTime} + {$timeout} ) <= " . microtime(true) . ') {a (' . $this->enterIdleLastTime + (FLOAT) $timeout . ')' . PHP_EOL;
             
-            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= microtime(true)) {
+            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= $microtime) {
                 
                 echo "a if ($timeout !== null AND ( $this->enterIdleLastTime + $timeout ) <= " . microtime(true) . ") {b" . PHP_EOL;
 
