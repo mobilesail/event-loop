@@ -239,7 +239,7 @@ class StreamSelectLoop implements LoopInterface
                 echo "a if ($timeout !== null AND ( $this->enterIdleLastTime + $timeout ) <= " . microtime(true) . ") {b" . PHP_EOL;
 
                 
-                $this->enterIdleLastTime = microtime(true);
+                $this->enterIdleLastTime = (FLOAT) microtime(true);
                 
                 echo "this->enterIdleLastTime = " . $this->enterIdleLastTime . PHP_EOL;
                 
