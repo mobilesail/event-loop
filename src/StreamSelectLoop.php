@@ -25,6 +25,8 @@ class StreamSelectLoop implements LoopInterface
     private $enterIdleLastTime = 0;
     private $enterIdleTimeOut = 0;
     private $enterIdleStatus = false;
+    private $signalInterruptStreams = [];
+    private $signalInterruptListeners = [];
     private $onWakeStreams = [];
     private $onWakeListeners = [];
     
@@ -168,6 +170,25 @@ class StreamSelectLoop implements LoopInterface
         );
     }
     
+    public function addSignalInterrupted($stream, $listener){
+        $key = (int) $stream;
+
+        if (!isset($this->signalInterruptListeners[$key])) {
+            $this->signalInterruptStreams[$key] = $stream;
+            $this->signalInterruptListeners[$key] = $listener;
+        }
+    }
+    
+    public function removeSignalInterrupted($stream)
+    {
+        $key = (int) $stream;
+
+        unset(
+            $this->signalInterruptStreams[$key],
+            $this->signalInterruptListeners[$key]
+        );
+    }
+    
     public function addOnWake($stream, $listener){
         $key = (int) $stream;
 
@@ -261,10 +282,8 @@ class StreamSelectLoop implements LoopInterface
             return;
         }
         
+        //check if SignalInterrupted or EnterIdle 
         if (0 == $available && $timeout !== null) {
-            
-            0 + 10 <= 10
-            10 + 10 <= 20
             
             if ($end_wait_mtime < ($init_wait_mtime + $timeout)){
                 //SignalInterrupted
@@ -292,7 +311,7 @@ class StreamSelectLoop implements LoopInterface
             return;
         }
         
-        //On WakeUp
+        //Check for WakeUp
         if($this->enterIdleStatus){
             $this->enterIdleStatus = false;
             
