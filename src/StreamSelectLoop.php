@@ -24,6 +24,9 @@ class StreamSelectLoop implements LoopInterface
     private $enterIdleListeners = [];
     private $enterIdleLastTime = 0;
     private $enterIdleTimeOut = 0;
+    private $enterIdleStatus = false;
+    private $onWakeStreams = [];
+    private $onWakeListeners = [];
     
     private $running;
 
@@ -165,6 +168,25 @@ class StreamSelectLoop implements LoopInterface
         );
     }
     
+    public function addOnWake($stream, $listener){
+        $key = (int) $stream;
+
+        if (!isset($this->onWakeListeners[$key])) {
+            $this->onWakeStreams[$key] = $stream;
+            $this->onWakeListeners[$key] = $listener;
+        }
+    }
+    
+    public function removeOnWake($stream)
+    {
+        $key = (int) $stream;
+
+        unset(
+            $this->onWakeStreams[$key],
+            $this->onWakeListeners[$key]
+        );
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -257,6 +279,19 @@ class StreamSelectLoop implements LoopInterface
             // if a system call has been interrupted,
             // we cannot rely on it's outcome
             return;
+        }
+        
+        //On WakeUp
+        if($this->enterIdleStatus){
+            $this->enterIdleStatus = false;
+            
+            foreach ($this->onWakeStreams as $onWakeStream) {
+                $key = (int) $onWakeStream;
+
+                if (isset($this->onWakeListeners[$key])) {
+                    call_user_func($this->onWakeListeners[$key], $onWakeStream, $this);
+                }
+            }
         }
         
         foreach ($read as $stream) {
