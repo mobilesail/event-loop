@@ -294,7 +294,7 @@ class StreamSelectLoop implements LoopInterface
             $diff_idle_mtime = ($end_wait_mtime - $this->enterIdleInitTime);
             $diff_wait_mstime = ($end_wait_mtime - $this->enterIdleInitTime) / 1000;
             $this->_writeLog("SOIdle: $end_wait_mtime - $this->enterIdleInitTime = $diff_idle_mtime = $diff_wait_mstime ms");
-            $this->_writeLog("SOIdle: ($diff_idle_mtime - $this->enterIdleTimeOut)".($diff_idle_mtime >= $this->enterIdleTimeOut)." ".(($diff_idle_mtime - $this->enterIdleTimeOut) / 1000));
+            $this->_writeLog("SOIdle: ($diff_idle_mtime - $this->enterIdleTimeOut) ".($diff_idle_mtime >= $this->enterIdleTimeOut)." ".(($diff_idle_mtime - $this->enterIdleTimeOut) / 1000));
             
             if (($end_wait_mtime - $this->enterIdleInitTime) >= $this->enterIdleTimeOut) {
                 //EnterIdling    
