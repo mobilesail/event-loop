@@ -287,16 +287,16 @@ class StreamSelectLoop implements LoopInterface
             
             $diff_wait_mtime = ($end_wait_mtime - $init_wait_mtime);
             $diff_wait_mstime = ($end_wait_mtime - $init_wait_mtime) / 1000;
-            $this->_writeLog("SO: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
-            $this->_writeLog("SO: ($diff_wait_mtime >= $timeout)".($diff_wait_mtime >= $timeout));
+            $this->_writeLog("SOSig: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
+            $this->_writeLog("SOSig: ($diff_wait_mtime >= $timeout)".($diff_wait_mtime >= $timeout));
             
             
             $diff_idle_mtime = ($end_wait_mtime - $this->enterIdleInitTime);
             $diff_wait_mstime = ($end_wait_mtime - $this->enterIdleInitTime) / 1000;
-            $this->_writeLog("SO: $end_wait_mtime - $this->enterIdleInitTime = $diff_idle_mtime = $diff_wait_mstime ms");
-            $this->_writeLog("SO: ($diff_idle_mtime - $timeout)".($diff_idle_mtime - $timeout));
+            $this->_writeLog("SOIdle: $end_wait_mtime - $this->enterIdleInitTime = $diff_idle_mtime = $diff_wait_mstime ms");
+            $this->_writeLog("SOIdle: ($diff_idle_mtime - $this->enterIdleTimeOut)".($diff_idle_mtime - $this->enterIdleTimeOut));
             
-            if (($end_wait_mtime - $this->enterIdleInitTime) >= $enterIdleTimeOut) {
+            if (($end_wait_mtime - $this->enterIdleInitTime) >= $this->enterIdleTimeOut) {
                 //EnterIdling    
                 $this->enterIdleStatus = true;
                 $this->enterIdleInitTime = $end_wait_mtime;
