@@ -288,17 +288,7 @@ class StreamSelectLoop implements LoopInterface
             $this->_writeLog("SO: (($end_wait_mtime - $init_wait_mtime) >= $timeout)");
             $this->_writeLog("SO: $end_wait_mtime - $init_wait_mtime = " . ($end_wait_mtime - $init_wait_mtime));
             
-            if (($end_wait_mtime - $init_wait_mtime) < $timeout){
-                //SignalInterrupted
-                foreach ($this->signalInterruptStreams as $signalInterruptStream) {
-                    $key = (int) $signalInterruptStream;
-
-                    if (isset($this->signalInterruptListeners[$key])) {
-                        call_user_func($this->signalInterruptListeners[$key], $signalInterruptStream, $this);
-                    }
-                }
-            } 
-            else if (($end_wait_mtime - $this->enterIdleLastTime) >= $enterIdleTimeOut) {
+            if (($end_wait_mtime - $this->enterIdleLastTime) >= $enterIdleTimeOut) {
                 //EnterIdling    
                 $this->enterIdleStatus = true;
                 $this->enterIdleLastTime = $end_wait_mtime;
@@ -311,6 +301,18 @@ class StreamSelectLoop implements LoopInterface
                     }
                 }
             }
+            
+            if (($end_wait_mtime - $init_wait_mtime) < $timeout){
+                //SignalInterrupted
+                foreach ($this->signalInterruptStreams as $signalInterruptStream) {
+                    $key = (int) $signalInterruptStream;
+
+                    if (isset($this->signalInterruptListeners[$key])) {
+                        call_user_func($this->signalInterruptListeners[$key], $signalInterruptStream, $this);
+                    }
+                }
+            } 
+            
             
             // if a system call has been interrupted, or timeout,
             // we cannot rely on it's outcome
