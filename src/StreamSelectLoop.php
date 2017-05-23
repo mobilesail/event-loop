@@ -285,8 +285,10 @@ class StreamSelectLoop implements LoopInterface
         //check if SignalInterrupted or EnterIdle 
         if (0 == $available && $timeout !== null) {
             
-            $this->_writeLog("SO: (($end_wait_mtime - $init_wait_mtime) >= $timeout)");
-            $this->_writeLog("SO: $end_wait_mtime - $init_wait_mtime = " . ($end_wait_mtime - $init_wait_mtime));
+            $diff_wait_mtime = ($end_wait_mtime - $init_wait_mtime);
+            $diff_wait_mstime = ($end_wait_mtime - $init_wait_mtime) / 1000;
+            $this->_writeLog("SO: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
+            $this->_writeLog("SO: ($diff_wait_mtime >= $timeout)");
             
             if (($end_wait_mtime - $this->enterIdleInitTime) >= $enterIdleTimeOut) {
                 //EnterIdling    
