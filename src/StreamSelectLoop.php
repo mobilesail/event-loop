@@ -248,8 +248,12 @@ class StreamSelectLoop implements LoopInterface
     {
         $read  = $this->readStreams;
         $write = $this->writeStreams;
-
+        
+        $init_wait_mtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
+        
         $available = $this->streamSelect($read, $write, $timeout);
+        
+        $end_wait_mtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
         
         if (false === $available) {
             // if a system call has been interrupted,
@@ -257,15 +261,23 @@ class StreamSelectLoop implements LoopInterface
             return;
         }
         
-        if (0 == $available) {
-            //Idling
+        if (0 == $available && $timeout !== null) {
             
-            $current_mtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
+            0 + 10 <= 10
+            10 + 10 <= 20
             
-            if ($timeout !== null && ($this->enterIdleLastTime + $timeout) <= $current_mtime) {
-                
-                $this->enterIdleLastTime = $current_mtime;
-                
+            if ($end_wait_mtime < ($init_wait_mtime + $timeout)){
+                //SignalInterrupted
+                foreach ($this->signalInterruptStreams as $signalInterruptStream) {
+                    $key = (int) $signalInterruptStream;
+
+                    if (isset($this->signalInterruptListeners[$key])) {
+                        call_user_func($this->signalInterruptListeners[$key], $signalInterruptStream, $this);
+                    }
+                }
+            } 
+            else if ($end_wait_mtime >= ($init_wait_mtime + $timeout)) {
+                //EnterIdling    
                 foreach ($this->enterIdleStreams as $enterIdleStream) {
                     $key = (int) $enterIdleStream;
 
@@ -273,10 +285,9 @@ class StreamSelectLoop implements LoopInterface
                         call_user_func($this->enterIdleListeners[$key], $enterIdleStream, $this);
                     }
                 }
-                
             }
             
-            // if a system call has been interrupted,
+            // if a system call has been interrupted, or timeout,
             // we cannot rely on it's outcome
             return;
         }
