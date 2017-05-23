@@ -285,6 +285,10 @@ class StreamSelectLoop implements LoopInterface
         //check if SignalInterrupted or EnterIdle 
         if (0 == $available && $timeout !== null) {
             
+            $this->_writeLog("SO: $end_wait_mtime < ($init_wait_mtime + $timeout)");
+            $this->_writeLog("SO: $end_wait_mtime < ".($init_wait_mtime + $timeout));
+            $this->_writeLog("SO: $end_wait_mtime - ($init_wait_mtime + $timeout) = ".( $end_wait_mtime - ($init_wait_mtime + $timeout)));
+            
             if ($end_wait_mtime < ($init_wait_mtime + $timeout)){
                 //SignalInterrupted
                 foreach ($this->signalInterruptStreams as $signalInterruptStream) {
@@ -365,5 +369,21 @@ class StreamSelectLoop implements LoopInterface
         $timeout && usleep($timeout);
 
         return 0;
+    }
+    
+    function _writeLog($info_){
+        if(defined('_SYSTEMDAEMON')){
+            echo date("[H:i:s]: ")."{$info_}\n";
+        }
+        
+        /*
+        if(defined('_SYSTEMDAEMON')){
+            System_Daemon::log(System_Daemon::LOG_INFO, $info_);
+        }
+        else {
+            echo date("[H:i:s]: ")."{$info_}\n";
+        }
+         * 
+         */
     }
 }
