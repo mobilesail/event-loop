@@ -277,6 +277,7 @@ class StreamSelectLoop implements LoopInterface
         $end_wait_mtime = (microtime(true) * self::MICROSECONDS_PER_SECOND);
         
         if (false === $available) {
+            $this->_writeLog("Maybe SignalInterrupted");
             // if a system call has been interrupted,
             // we cannot rely on it's outcome
             return;
