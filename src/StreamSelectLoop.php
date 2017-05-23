@@ -296,6 +296,7 @@ class StreamSelectLoop implements LoopInterface
                 }
             } 
             else if ($end_wait_mtime >= ($init_wait_mtime + $timeout)) {
+                $this->enterIdleStatus = true;
                 //EnterIdling    
                 foreach ($this->enterIdleStreams as $enterIdleStream) {
                     $key = (int) $enterIdleStream;
