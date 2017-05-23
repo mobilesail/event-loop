@@ -22,7 +22,7 @@ class StreamSelectLoop implements LoopInterface
     private $writeListeners = [];
     private $enterIdleStreams = [];
     private $enterIdleListeners = [];
-    private $enterIdleLastTime = 0;
+    private $enterIdleInitTime = 0;
     private $enterIdleTimeOut = 0;
     private $enterIdleStatus = false;
     private $signalInterruptStreams = [];
@@ -288,10 +288,10 @@ class StreamSelectLoop implements LoopInterface
             $this->_writeLog("SO: (($end_wait_mtime - $init_wait_mtime) >= $timeout)");
             $this->_writeLog("SO: $end_wait_mtime - $init_wait_mtime = " . ($end_wait_mtime - $init_wait_mtime));
             
-            if (($end_wait_mtime - $this->enterIdleLastTime) >= $enterIdleTimeOut) {
+            if (($end_wait_mtime - $this->enterIdleInitTime) >= $enterIdleTimeOut) {
                 //EnterIdling    
                 $this->enterIdleStatus = true;
-                $this->enterIdleLastTime = $end_wait_mtime;
+                $this->enterIdleInitTime = $end_wait_mtime;
                                 
                 foreach ($this->enterIdleStreams as $enterIdleStream) {
                     $key = (int) $enterIdleStream;
@@ -319,6 +319,7 @@ class StreamSelectLoop implements LoopInterface
             return;
         }
         
+        $this->enterIdleInitTime = $end_wait_mtime;
         //Check for WakeUp
         if($this->enterIdleStatus){
             $this->enterIdleStatus = false;
