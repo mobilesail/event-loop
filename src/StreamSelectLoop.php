@@ -155,6 +155,16 @@ class StreamSelectLoop implements LoopInterface
         }
     }
     
+    public function removeEnterIdle($stream)
+    {
+        $key = (int) $stream;
+
+        unset(
+            $this->enterIdleStreams[$key],
+            $this->enterIdleListeners[$key]
+        );
+    }
+    
     /**
      * {@inheritdoc}
      */
