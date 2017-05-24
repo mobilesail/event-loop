@@ -310,8 +310,12 @@ class StreamSelectLoop implements LoopInterface
                     }
                 }
             }
+            else {
+                $this->_writeLog("no idle maybe signal interrupted");
+            }
             
             if (($end_wait_mtime - $init_wait_mtime) < $timeout){
+                $this->_writeLog("signal interrupted");
                 //SignalInterrupted
                 foreach ($this->signalInterruptStreams as $signalInterruptStream) {
                     $key = (int) $signalInterruptStream;
@@ -320,7 +324,10 @@ class StreamSelectLoop implements LoopInterface
                         call_user_func($this->signalInterruptListeners[$key], $signalInterruptStream, $this);
                     }
                 }
-            } 
+            }
+            else if(!$this->enterIdleStatus) {
+                $this->_writeLog("no idle? no signal interrupted? WTF...");
+            }
             
             
             // if a system call has been interrupted, or timeout,
