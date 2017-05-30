@@ -267,6 +267,8 @@ class StreamSelectLoop implements LoopInterface
      */
     private function waitForStreamActivity($timeout)
     {
+        $this->_writeLog("[waitForStreamActivity IN] timeout: {$timeout}" . posix_getpid() . ' ' . posix_getppid() );
+        
         $read  = $this->readStreams;
         $write = $this->writeStreams;
         
@@ -278,8 +280,24 @@ class StreamSelectLoop implements LoopInterface
         
         if (false === $available) {
             $this->_writeLog("Maybe SignalInterrupted");
-            // if a system call has been interrupted,
-            // we cannot rely on it's outcome
+            
+            $diff_wait_mtime = ($end_wait_mtime - $init_wait_mtime);
+            $diff_wait_mstime = ($end_wait_mtime - $init_wait_mtime) / 1000;
+            $this->_writeLog("SOSig: $end_wait_mtime - $init_wait_mtime = $diff_wait_mtime = $diff_wait_mstime ms");
+            $this->_writeLog("SOSig: ($diff_wait_mtime >= $timeout)".($diff_wait_mtime >= $timeout)." ".(($diff_wait_mtime - $timeout) / 1000));
+            
+            if (($end_wait_mtime - $init_wait_mtime) < $timeout){
+                $this->_writeLog("signal interrupted false === \$available");
+                //SignalInterrupted
+                foreach ($this->signalInterruptStreams as $signalInterruptStream) {
+                    $key = (int) $signalInterruptStream;
+
+                    if (isset($this->signalInterruptListeners[$key])) {
+                        call_user_func($this->signalInterruptListeners[$key], $signalInterruptStream, $this);
+                    }
+                }
+            }
+            
             return;
         }
         
