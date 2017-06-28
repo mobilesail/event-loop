@@ -412,7 +412,7 @@ class StreamSelectLoop implements LoopInterface
     
     function _writeLog($info_){
         if(defined('_SYSTEMDAEMON')){
-            echo date("[H:i:s]: ")."{$info_}\n";
+            //echo date("[H:i:s]: ")."{$info_}\n";
         }
         
         /*
